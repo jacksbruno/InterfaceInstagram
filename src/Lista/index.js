@@ -8,6 +8,47 @@ export default class Lista extends Component {
     this.state = {
       feed: this.props.data
     }
+
+    this.like = this.like.bind(this)
+    this.imgLike = this.imgLike.bind(this)
+    this.mostraLikers = this.mostraLikers.bind(this)
+  }
+
+  imgLike(likeada){
+    return likeada ? require('../assets/img/likeada.png') : require('../assets/img/like.png')
+  }
+
+  like(){
+    let feed = this.state.feed
+
+    if(feed.likeada){
+      this.setState({
+        feed:{
+          ...feed,
+          likeada: false,
+          likers: feed.likers - 1
+        }
+      })
+    }else{
+      this.setState({
+        feed:{
+          ...feed,
+          likeada: true,
+          likers: feed.likers + 1
+        }
+      })
+    }
+  }
+
+  mostraLikers() {
+    let feed = this.state.feed
+
+    if(feed.likers <= 0) return
+    return(
+      <Text style={styles.likes}>
+        { feed.likers } { feed.likers > 1 ? "curtidas" : "curtida" }
+      </Text>
+    )
   }
 
   render(){
@@ -19,13 +60,18 @@ export default class Lista extends Component {
         </View>
         <Image style={styles.fotoPublicacao} source={{uri: this.state.feed.imgPublicacao}} resizeMode="cover" />
         <View style={styles.areaIcone}>
-          <TouchableOpacity>
-            <Image style={styles.icone} source={require('../assets/img/like.png')} />
+          <TouchableOpacity onPress={this.like}>
+            <Image style={styles.icone} source={this.imgLike(this.state.feed.likeada)} />
           </TouchableOpacity>
           <TouchableOpacity style={{paddingLeft:5}}>
             <Image style={styles.icone} source={require('../assets/img/send.png')} />
           </TouchableOpacity>
         </View>
+
+        {
+          this.mostraLikers()
+        }
+
         <View style={styles.viewRodape}>
           <Text style={styles.nomeRodape}>{ this.state.feed.nome }</Text>
           <Text style={styles.descRodape}>{ this.state.feed.descricao }</Text>
@@ -67,6 +113,10 @@ const styles = StyleSheet.create({
   icone: {
     width: 30,
     height: 30
+  },
+  likes: {
+    fontWeight: "bold",
+    paddingLeft: 5
   },
   viewRodape: {
     flexDirection: "row",
